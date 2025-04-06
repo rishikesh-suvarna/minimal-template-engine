@@ -75,7 +75,7 @@ export class TodoComponent extends Component {
   }
 
   // Event handlers
-  private _handleAddTask(e: Event): void {
+  private _handleAddTask(_e: Event): void {
     const input = document.querySelector('#new-todo') as HTMLInputElement;
 
     if (!input) return;
