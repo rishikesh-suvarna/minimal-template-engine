@@ -34,3 +34,21 @@ export {
   TemplateEngineOptions,
   ComponentOptions
 };
+
+// Export benchmark utilities
+import {
+  TemplateBenchmark,
+  BenchmarkVisualizer,
+  TemplateEngine,
+  BenchmarkResult,
+  TemplateEngineResults,
+  BenchmarkResults
+} from './benchmark';
+export {
+  TemplateBenchmark,
+  BenchmarkVisualizer,
+  TemplateEngine,
+  BenchmarkResult,
+  TemplateEngineResults,
+  BenchmarkResults
+};
