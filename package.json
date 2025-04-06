@@ -1,0 +1,19 @@
+{
+  "name": "minimal-template",
+  "version": "1.0.0",
+  "description": "MinimalTemplate - A lightweight, high-performance template engine",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "nodemon",
+    "build": "tsc"
+  },
+  "keywords": [],
+  "author": "Rishikesh Suvarna",
+  "license": "ISC",
+  "dependencies": {
+    "typescript": "^5.8.3"
+  },
+  "devDependencies": {
+    "ts-node": "^10.9.2"
+  }
+}

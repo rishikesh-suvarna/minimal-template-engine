@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MinimalTemplate Demo</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 30px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .example-section {
+      margin-bottom: 40px;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    h2 {
+      color: #2c3e50;
+      margin-top: 0;
+    }
+
+    pre {
+      background-color: #f8f9fa;
+      padding: 15px;
+      border-radius: 4px;
+      overflow: auto;
+    }
+
+    code {
+      font-family: 'Courier New', Courier, monospace;
+    }
+
+    .output {
+      margin-top: 20px;
+      padding: 15px;
+      background-color: #f1f8ff;
+      border-radius: 4px;
+      border-left: 5px solid #0366d6;
+    }
+
+    .user-card,
+    .product-card,
+    .todo-list,
+    .todo-app {
+      padding: 15px;
+      border-radius: 4px;
+      background-color: white;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .completed {
+      text-decoration: line-through;
+      color: #7f8c8d;
+    }
+
+    .badge {
+      background-color: #27ae60;
+      color: white;
+      font-size: 0.8em;
+      padding: 2px 8px;
+      border-radius: 4px;
+      margin-left: 10px;
+    }
+
+    .buy-button {
+      background-color: #3498db;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .out-of-stock {
+      color: #e74c3c;
+      font-weight: bold;
+    }
+
+    .todo-app {
+      width: 100%;
+      max-width: 500px;
+    }
+
+    .todo-app li {
+      display: flex;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid #eee;
+    }
+
+    .todo-app input[type="checkbox"] {
+      margin-right: 10px;
+    }
+
+    .add-todo {
+      margin-top: 15px;
+      display: flex;
+      gap: 10px;
+    }
+
+    .add-todo input {
+      flex: 1;
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+
+    .add-todo button {
+      background-color: #2ecc71;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .benchmark-results table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+    }
+
+    .benchmark-results th,
+    .benchmark-results td {
+      padding: 12px;
+      text-align: left;
+      border: 1px solid #ddd;
+    }
+
+    .benchmark-results th {
+      background-color: #f2f2f2;
+      font-weight: bold;
+    }
+
+    .benchmark-results tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>MinimalTemplate Demo</h1>
+    <p>A lightweight, high-performance JavaScript template engine</p>
+  </header>
+
+  <main>
+    <div class="example-section">
+      <h2>Simple Variable Substitution</h2>
+      <pre><code>
+const simpleTemplate = `
+  &lt;div class="user-card"&gt;
+    &lt;h2&gt;Hello, {{ name }}!&lt;/h2&gt;
+    &lt;p&gt;Your role is: {{ role }}&lt;/p&gt;
+  &lt;/div&gt;
+`;
+
+const userData = {
+  name: 'John Doe',
+  role: 'Developer'
+};
+
+engine.renderToDOM('#simple-example', simpleTemplate, userData);
+      </code></pre>
+
+      <div class="output">
+        <h3>Output:</h3>
+        <div id="simple-example"></div>
+      </div>
+    </div>
+
+    <div class="example-section">
+      <h2>Conditional Rendering</h2>
+      <pre><code>
+const conditionalTemplate = `
+  &lt;div class="product-card"&gt;
+    &lt;h3&gt;{{ product.name }}&lt;/h3&gt;
+    &lt;p&gt;{{ product.description }}&lt;/p&gt;
+    &lt;p&gt;Price: ${{ product.price }}&lt;/p&gt;
+    
+    {{ if product.inStock }}
+      &lt;button class="buy-button"&gt;Buy Now&lt;/button&gt;
+    {{ else }}
+      &lt;p class="out-of-stock"&gt;Out of Stock&lt;/p&gt;
+    {{ /if }}
+  &lt;/div&gt;
+`;
+
+const productData = {
+  product: {
+    name: 'Smartphone',
+    description: 'Latest model with amazing features',
+    price: 999.99,
+    inStock: true
+  }
+};
+
+engine.renderToDOM('#conditional-example', conditionalTemplate, productData);
+      </code></pre>
+
+      <div class="output">
+        <h3>Output:</h3>
+        <div id="conditional-example"></div>
+      </div>
+    </div>
+
+    <div class="example-section">
+      <h2>List Rendering</h2>
+      <pre><code>
+const listTemplate = `
+  &lt;div class="todo-list"&gt;
+    &lt;h3&gt;Todo List&lt;/h3&gt;
+    &lt;ul&gt;
+      {{ each item in items }}
+        &lt;li class="{{ item.completed ? 'completed' : '' }}"&gt;
+          {{ item.text }} 
+          {{ if item.completed }}
+            &lt;span class="badge"&gt;Done&lt;/span&gt;
+          {{ /if }}
+        &lt;/li&gt;
+      {{ /each }}
+    &lt;/ul&gt;
+    &lt;p&gt;Completed: {{ items.filter(i => i.completed).length }} / {{ items.length }}&lt;/p&gt;
+  &lt;/div&gt;
+`;
+
+const todoData = {
+  items: [
+    { text: 'Learn JavaScript', completed: true },
+    { text: 'Build a template engine', completed: false },
+    { text: 'Write documentation', completed: false },
+    { text: 'Create examples', completed: true }
+  ]
+};
+
+engine.renderToDOM('#list-example', listTemplate, todoData);
+      </code></pre>
+
+      <div class="output">
+        <h3>Output:</h3>
+        <div id="list-example"></div>
+      </div>
+    </div>
+
+    <div class="example-section">
+      <h2>Reusable Component</h2>
+      <pre><code>
+class TodoComponent extends Component {
+  constructor(selector) {
+    const template = `
+      &lt;div class="todo-app"&gt;
+        &lt;h3&gt;{{ title }}&lt;/h3&gt;
+        &lt;ul&gt;
+          {{ each item in items }}
+            &lt;li data-id="{{ $index }}" class="{{ item.completed ? 'completed' : '' }}"&gt;
+              &lt;input type="checkbox" {{ item.completed ? 'checked' : '' }} class="todo-checkbox"&gt;
+              &lt;span&gt;{{ item.text }}&lt;/span&gt;
+            &lt;/li&gt;
+          {{ /each }}
+        &lt;/ul&gt;
+        &lt;div class="add-todo"&gt;
+          &lt;input type="text" id="new-todo" placeholder="Add new item..."&gt;
+          &lt;button id="add-button"&gt;Add&lt;/button&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+    `;
+    
+    const data = {
+      title: 'My Tasks',
+      items: [
+        { text: 'Learn about template engines', completed: true },
+        { text: 'Build a project', completed: false },
+        { text: 'Share with others', completed: false }
+      ]
+    };
+    
+    super(template, data);
+    this.selector = selector;
+  }
+  
+  // ... Event handling methods
+}
+
+// Initialize component
+const todoComponent = new TodoComponent('#component-example');
+todoComponent.mount();
+      </code></pre>
+
+      <div class="output">
+        <h3>Output:</h3>
+        <div id="component-example"></div>
+      </div>
+    </div>
+
+    <div class="example-section">
+      <h2>Performance Benchmark</h2>
+      <p>Compare MinimalTemplate with other template engines:</p>
+      <button id="run-benchmark">Run Benchmark</button>
+      <div id="benchmark-results"></div>
+    </div>
+  </main>
+
+  <script type="module">
+    import { MinimalTemplate, Component, attachEvents } from './minimal-template-engine.js';
+    import { TemplateBenchmark } from './benchmark-utility.js';
+    import './demo-app.js';
+
+    // Add benchmark button handler
+    document.getElementById('run-benchmark').addEventListener('click', () => {
+      window.demo.runBenchmark();
+    });
+  </script>
+</body>
+
+</html>
