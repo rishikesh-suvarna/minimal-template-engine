@@ -6,17 +6,23 @@
   "engines": {
     "node": ">=18.0.0"
   },
+  "type": "module",
   "scripts": {
     "dev": "nodemon",
+    "lint": "eslint . --ext .ts",
+    "lint:fix": "eslint ./src --ext .ts --fix",
     "build": "tsc"
   },
   "keywords": [],
   "author": "Rishikesh Suvarna",
   "license": "ISC",
   "dependencies": {
+    "@typescript-eslint/eslint-plugin": "^8.29.0",
+    "@typescript-eslint/parser": "^8.29.0",
     "typescript": "^5.8.3"
   },
   "devDependencies": {
+    "eslint": "^9.24.0",
     "ts-node": "^10.9.2"
   }
 }
