@@ -1,7 +1,9 @@
-import { Component, attachEvents } from '../../dist/index.js';
+// Import the Component and attachEvents from the library
+import { Component, attachEvents } from '../../../dist/index.js';
 
 export class TodoComponent extends Component {
   private selector: string;
+  data: any;
 
   constructor(selector: string) {
     // Template definition
@@ -89,6 +91,16 @@ export class TodoComponent extends Component {
       this.update(data);
       input.value = '';
     }
+  }
+  getData() {
+    return this.data;
+  }
+  update(newData: Record<string, any>, shouldRender: boolean = true): this {
+    this.data = { ...this.data, ...newData };
+    if (shouldRender) {
+      this.render();
+    }
+    return this;
   }
 
   private _handleToggleComplete(e: Event): void {

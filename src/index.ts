@@ -1,4 +1,3 @@
-// src/index.ts
 // Export core functionality
 import { MinimalTemplate, Parser, Compiler, Renderer, RenderFunction } from './core';
 export { MinimalTemplate, Parser, Compiler, Renderer, RenderFunction };

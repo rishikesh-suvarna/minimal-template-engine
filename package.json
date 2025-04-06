@@ -16,7 +16,8 @@
     "format": "prettier --write \"src/**/*.ts\"",
     "prepare": "npm run build",
     "prepublishOnly": "npm test && npm run lint",
-    "example": "serve examples"
+    "build:examples": "node ./build-examples.js",
+    "example": "npm run build && npm run build:examples && serve dist/examples"
   },
   "keywords": [
     "template",
