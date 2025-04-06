@@ -1,6 +1,15 @@
-const { exec } = require('child_process');
-const fs = require('fs');
-const path = require('path');
+import { exec as execCallback } from 'child_process';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { promisify } from 'util';
+
+// Convert callback-based exec to promise-based
+const exec = promisify(execCallback);
+
+// Get current directory (equivalent to __dirname in CommonJS)
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Debug function to help diagnose issues
 function debug(message, obj = null) {
@@ -57,18 +66,31 @@ function ensureTsConfig() {
 // Call this before compiling TypeScript
 ensureTsConfig();
 
-// Compile TypeScript files with error handling and fallbacks
-console.log('Compiling TypeScript examples...');
-const tsconfigPath = path.join(__dirname, 'src', 'examples', 'tsconfig.json');
+// Main function to run the build process
+async function runBuild() {
+  try {
+    // Compile TypeScript files with error handling and fallbacks
+    console.log('Compiling TypeScript examples...');
+    const tsconfigPath = path.join(
+      __dirname,
+      'src',
+      'examples',
+      'tsconfig.json',
+    );
 
-exec(`npx tsc -p "${tsconfigPath}"`, (error, stdout, stderr) => {
-  if (error) {
-    console.error(`Error compiling examples with npx: ${error.message}`);
+    try {
+      // First attempt: npx tsc
+      await exec(`npx tsc -p "${tsconfigPath}"`);
+      console.log('Examples compiled successfully with npx tsc');
+    } catch (error) {
+      console.error(`Error compiling examples with npx: ${error.message}`);
 
-    // Try with traditional tsc
-    console.log('Trying with traditional tsc...');
-    exec(`tsc -p "${tsconfigPath}"`, (error2, stdout2, stderr2) => {
-      if (error2) {
+      try {
+        // Second attempt: traditional tsc
+        console.log('Trying with traditional tsc...');
+        await exec(`tsc -p "${tsconfigPath}"`);
+        console.log('Examples compiled successfully with traditional tsc');
+      } catch (error2) {
         console.error(
           `Error compiling with traditional tsc: ${error2.message}`,
         );
@@ -76,26 +98,16 @@ exec(`npx tsc -p "${tsconfigPath}"`, (error, stdout, stderr) => {
         // Manual TypeScript compilation attempt
         console.log('Attempting manual TypeScript compilation...');
         manualCompileTypeScript();
-        return;
       }
+    }
 
-      if (stderr2) {
-        console.warn(`TypeScript compiler warnings: ${stderr2}`);
-      }
-
-      console.log('Examples compiled successfully with traditional tsc');
-      continueWithBuild();
-    });
-    return;
+    // Continue with the rest of the build
+    copyMainLibraryDist();
+    copyHTMLFiles();
+  } catch (error) {
+    console.error('Build process failed:', error);
   }
-
-  if (stderr) {
-    console.warn(`TypeScript compiler warnings: ${stderr}`);
-  }
-
-  console.log('Examples compiled successfully with npx tsc');
-  continueWithBuild();
-});
+}
 
 // Function to manually compile TypeScript if tsc fails
 function manualCompileTypeScript() {
@@ -151,13 +163,6 @@ function manualCompileTypeScript() {
   });
 
   console.log('Manual TypeScript compilation completed');
-  continueWithBuild();
-}
-
-// Continue with the rest of the build process
-function continueWithBuild() {
-  copyMainLibraryDist();
-  copyHTMLFiles();
 }
 
 // Function to copy the main library dist folder to examples dist
@@ -195,38 +200,27 @@ function copyMainLibraryDist() {
   fs.mkdirSync(destPath, { recursive: true });
 
   // Read all files in the source directory
-  fs.readdir(sourcePath, (err, files) => {
-    if (err) {
-      console.error(`Error reading directory ${sourcePath}: ${err}`);
-      return;
-    }
+  const files = fs.readdirSync(sourcePath);
+  debug('Found files in source directory', files);
 
-    debug('Found files in source directory', files);
+  // Copy each file
+  files.forEach((file) => {
+    // Skip the examples directory to avoid recursion
+    if (file === 'examples') return;
 
-    // Copy each file
-    files.forEach((file) => {
-      // Skip the examples directory to avoid recursion
-      if (file === 'examples') return;
+    const sourceFile = path.join(sourcePath, file);
+    const destFile = path.join(destPath, file);
 
-      const sourceFile = path.join(sourcePath, file);
-      const destFile = path.join(destPath, file);
+    // Check if it's a directory or file
+    const stats = fs.statSync(sourceFile);
 
-      // Check if it's a directory or file
-      const stats = fs.statSync(sourceFile);
-
-      if (stats.isFile()) {
-        // Only copy JavaScript files, not TypeScript declaration files
-        if (file.endsWith('.js') || file.endsWith('.mjs')) {
-          fs.copyFile(sourceFile, destFile, (err) => {
-            if (err) {
-              console.error(`Error copying file ${sourceFile}: ${err}`);
-              return;
-            }
-            console.log(`Copied: ${sourceFile} to ${destFile}`);
-          });
-        }
+    if (stats.isFile()) {
+      // Only copy JavaScript files, not TypeScript declaration files
+      if (file.endsWith('.js') || file.endsWith('.mjs')) {
+        fs.copyFileSync(sourceFile, destFile);
+        console.log(`Copied: ${sourceFile} to ${destFile}`);
       }
-    });
+    }
   });
 
   // Update import paths in compiled JS files
@@ -249,41 +243,26 @@ function updateImportPaths() {
     }
 
     // Read all JS files in the directory
-    fs.readdir(distDir, (err, files) => {
-      if (err) {
-        console.error(`Error reading directory ${distDir}: ${err}`);
-        return;
+    const files = fs.readdirSync(distDir);
+
+    // Process JS files
+    files.forEach((file) => {
+      if (file.endsWith('.js')) {
+        const filePath = path.join(distDir, file);
+
+        // Read the file content
+        let data = fs.readFileSync(filePath, 'utf8');
+
+        // Replace relative imports to the project's dist folder with lib folder
+        const updatedContent = data.replace(
+          /from\s+['"]\.\.\/\.\.\/\.\.\/dist\//g,
+          "from '../lib/",
+        );
+
+        // Write the updated content back to the file
+        fs.writeFileSync(filePath, updatedContent);
+        console.log(`Updated import paths in: ${filePath}`);
       }
-
-      // Process JS files
-      files.forEach((file) => {
-        if (file.endsWith('.js')) {
-          const filePath = path.join(distDir, file);
-
-          // Read the file content
-          fs.readFile(filePath, 'utf8', (err, data) => {
-            if (err) {
-              console.error(`Error reading file ${filePath}: ${err}`);
-              return;
-            }
-
-            // Replace relative imports to the project's dist folder with lib folder
-            const updatedContent = data.replace(
-              /from\s+['"]\.\.\/\.\.\/\.\.\/dist\//g,
-              "from '../lib/",
-            );
-
-            // Write the updated content back to the file
-            fs.writeFile(filePath, updatedContent, (err) => {
-              if (err) {
-                console.error(`Error writing file ${filePath}: ${err}`);
-                return;
-              }
-              console.log(`Updated import paths in: ${filePath}`);
-            });
-          });
-        }
-      });
     });
   });
 }
@@ -308,36 +287,24 @@ function copyHTMLFiles() {
     }
 
     // Read all files in the directory
-    fs.readdir(sourcePath, (err, files) => {
-      if (err) {
-        console.error(`Error reading directory ${sourcePath}: ${err}`);
-        return;
+    const files = fs.readdirSync(sourcePath);
+
+    // Copy HTML files
+    files.forEach((file) => {
+      if (file.endsWith('.html')) {
+        const sourceFile = path.join(sourcePath, file);
+        const destFile = path.join(destPath, file);
+
+        // Read the file content
+        const data = fs.readFileSync(sourceFile, 'utf8');
+
+        // Copy HTML files to dist directory
+        fs.writeFileSync(destFile, data);
+        console.log(`Copied: ${destFile}`);
       }
-
-      // Copy HTML files
-      files.forEach((file) => {
-        if (file.endsWith('.html')) {
-          const sourceFile = path.join(sourcePath, file);
-          const destFile = path.join(destPath, file);
-
-          // Read the file content
-          fs.readFile(sourceFile, 'utf8', (err, data) => {
-            if (err) {
-              console.error(`Error reading file ${sourceFile}: ${err}`);
-              return;
-            }
-
-            // Copy HTML files to dist directory
-            fs.writeFile(destFile, data, (err) => {
-              if (err) {
-                console.error(`Error writing file ${destFile}: ${err}`);
-                return;
-              }
-              console.log(`Copied: ${destFile}`);
-            });
-          });
-        }
-      });
     });
   });
 }
+
+// Run the build process
+runBuild();
