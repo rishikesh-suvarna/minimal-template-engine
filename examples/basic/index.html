@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MinimalTemplate Usage Examples</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    h1 {
+      color: #2c3e50;
+      border-bottom: 2px solid #eee;
+      padding-bottom: 10px;
+    }
+
+    .example {
+      background-color: #f8f9fa;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 30px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    h2 {
+      margin-top: 0;
+      color: #3498db;
+    }
+
+    .code {
+      background-color: #f1f1f1;
+      padding: 15px;
+      border-radius: 4px;
+      overflow-x: auto;
+      margin: 15px 0;
+    }
+
+    pre {
+      margin: 0;
+      font-family: 'Courier New', Courier, monospace;
+    }
+
+    .output {
+      background-color: #e8f4fc;
+      padding: 15px;
+      border-radius: 4px;
+      margin: 15px 0;
+      border-left: 4px solid #3498db;
+    }
+
+    .controls {
+      margin-top: 15px;
+    }
+
+    button {
+      background-color: #3498db;
+      color: white;
+      border: none;
+      padding: 8px 15px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    button:hover {
+      background-color: #2980b9;
+    }
+
+    .tip {
+      background-color: #d4edda;
+      color: #155724;
+      padding: 10px 15px;
+      border-radius: 4px;
+      margin: 15px 0;
+      border-left: 4px solid #28a745;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>MinimalTemplate Usage Examples</h1>
+
+  <div class="example">
+    <h2>Basic Variable Substitution</h2>
+    <p>Insert variables into your template with <code>{{ variableName }}</code> syntax:</p>
+
+    <div class="code">
+      <pre><code>// Initialize the template engine
+const engine = new MinimalTemplate();
+
+// Define your template
+const template = `
+  &lt;div&gt;
+    &lt;h3&gt;Hello, {{ name }}!&lt;/h3&gt;
+    &lt;p&gt;Welcome to {{ company }}.&lt;/p&gt;
+  &lt;/div&gt;
+`;
+
+// Define your data
+const data = {
+  name: "John",
+  company: "Acme Corp"
+};
+
+// Render the template with the data
+const html = engine.render(template, data);
+
+// Insert into the DOM
+document.getElementById('basic-example').innerHTML = html;</code></pre>
+    </div>
+
+    <div class="output" id="basic-example"></div>
+
+    <div class="controls">
+      <button id="update-basic">Change Data</button>
+    </div>
+  </div>
+
+  <div class="example">
+    <h2>Conditional Rendering</h2>
+    <p>Use conditions to show or hide parts of your template:</p>
+
+    <div class="code">
+      <pre><code>const template = `
+  &lt;div class="user-profile"&gt;
+    &lt;h3&gt;{{ user.name }}&lt;/h3&gt;
+    
+    {{ if user.isAdmin }}
+      &lt;span class="badge"&gt;Administrator&lt;/span&gt;
+      &lt;div class="admin-controls"&gt;
+        &lt;button&gt;Manage Users&lt;/button&gt;
+      &lt;/div&gt;
+    {{ else }}
+      &lt;span class="badge"&gt;User&lt;/span&gt;
+    {{ /if }}
+    
+    &lt;p&gt;Last login: {{ user.lastLogin }}&lt;/p&gt;
+  &lt;/div&gt;
+`;
+
+const data = {
+  user: {
+    name: "Sarah Johnson",
+    isAdmin: true,
+    lastLogin: "Yesterday at 2:30 PM"
+  }
+};
+
+document.getElementById('conditional-example').innerHTML = 
+  engine.render(template, data);</code></pre>
+    </div>
+
+    <div class="output" id="conditional-example"></div>
+
+    <div class="controls">
+      <button id="toggle-admin">Toggle Admin Status</button>
+    </div>
+  </div>
+
+  <div class="example">
+    <h2>Loop Rendering</h2>
+    <p>Iterate through arrays with the <code>each</code> statement:</p>
+
+    <div class="code">
+      <pre><code>const template = `
+  &lt;div class="product-list"&gt;
+    &lt;h3&gt;Products ({{ products.length }})&lt;/h3&gt;
+    
+    &lt;ul&gt;
+      {{ each product in products }}
+        &lt;li class="{{ product.inStock ? 'in-stock' : 'out-of-stock' }}"&gt;
+          &lt;strong&gt;{{ product.name }}&lt;/strong&gt; - ${{ product.price }}
+          
+          {{ if !product.inStock }}
+            &lt;span class="status"&gt;Out of Stock&lt;/span&gt;
+          {{ /if }}
+        &lt;/li&gt;
+      {{ /each }}
+    &lt;/ul&gt;
+    
+    &lt;p&gt;Total value: ${{ products.reduce((sum, p) => sum + p.price, 0).toFixed(2) }}&lt;/p&gt;
+  &lt;/div&gt;
+`;
+
+const data = {
+  products: [
+    { name: "Laptop", price: 999.99, inStock: true },
+    { name: "Smartphone", price: 699.99, inStock: true },
+    { name: "Headphones", price: 149.99, inStock: false },
+    { name: "Tablet", price: 399.99, inStock: true }
+  ]
+};
+
+document.getElementById('loop-example').innerHTML = 
+  engine.render(template, data);</code></pre>
+    </div>
+
+    <div class="output" id="loop-example"></div>
+
+    <div class="controls">
+      <button id="add-product">Add Product</button>
+      <button id="toggle-stock">Toggle Stock Status</button>
+    </div>
+  </div>
+
+  <div class="example">
+    <h2>DOM Rendering</h2>
+    <p>Render templates directly to DOM elements:</p>
+
+    <div class="code">
+      <pre><code>// Define your template
+const template = `
+  &lt;div class="counter-widget"&gt;
+    &lt;h3&gt;Counter: {{ count }}&lt;/h3&gt;
+    &lt;p&gt;{{ count % 2 === 0 ? 'Even' : 'Odd' }} number&lt;/p&gt;
+  &lt;/div&gt;
+`;
+
+// Initial data
+const data = { count: 0 };
+
+// Render directly to a DOM element
+engine.renderToDOM('#dom-example-output', template, data);
+
+// Later, update with new data and re-render
+document.getElementById('increment-counter').addEventListener('click', () => {
+  data.count++;
+  engine.renderToDOM('#dom-example-output', template, data);
+});</code></pre>
+    </div>
+
+    <div class="output" id="dom-example-output"></div>
+
+    <div class="controls">
+      <button id="increment-counter">Increment Counter</button>
+      <button id="reset-counter">Reset Counter</button>
+    </div>
+  </div>
+
+  <div class="tip">
+    <strong>Tip:</strong> For more advanced usage, including components and event handling, see the <a
+      href="https://github.com/yourusername/minimal-template#readme">documentation</a>.
+  </div>
+
+  <script type="module" src="./basic.js"></script>
+</body>
+
+</html>

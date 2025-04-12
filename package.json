@@ -16,9 +16,7 @@
     "lint": "eslint src --ext .ts",
     "format": "prettier --write \"src/**/*.ts\"",
     "prepare": "npm run build",
-    "prepublishOnly": "npm test && npm run lint",
-    "build:examples": "node ./build-examples.js",
-    "example": "npm run build && npm run build:examples && serve dist/examples"
+    "prepublishOnly": "npm test && npm run lint"
   },
   "keywords": [
     "template",
