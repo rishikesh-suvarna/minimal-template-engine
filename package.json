@@ -1,5 +1,5 @@
 {
-  "name": "minimal-template",
+  "name": "minimal-template-engine",
   "version": "1.0.0",
   "description": "MinimalTemplate - A lightweight, high-performance template engine",
   "main": "dist/index.js",
