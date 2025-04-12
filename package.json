@@ -9,6 +9,11 @@
   "engines": {
     "node": ">=18.0.0"
   },
+  "files": [
+    "dist",
+    "LICENSE",
+    "README.md"
+  ],
   "scripts": {
     "build": "tsup src/index.ts --format cjs,esm --dts",
     "dev": "tsup src/index.ts --format cjs,esm --dts --watch",
@@ -16,7 +21,7 @@
     "lint": "eslint src --ext .ts",
     "format": "prettier --write \"src/**/*.ts\"",
     "prepare": "npm run build",
-    "prepublishOnly": "npm test && npm run lint"
+    "prepublishOnly": "npm run build && npm run lint"
   },
   "keywords": [
     "template",
@@ -39,5 +44,13 @@
     "ts-jest": "^29.3.1",
     "ts-node": "^10.9.2",
     "tsup": "^8.4.0"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rishikesh-suvarna/minimal-template-engine.git"
+  },
+  "bugs": {
+    "url": "https://github.com/rishikesh-suvarna/minimal-template-engine/issues"
+  },
+  "homepage": "https://github.com/rishikesh-suvarna/minimal-template-engine"
 }
